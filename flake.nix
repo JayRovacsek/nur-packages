@@ -1,7 +1,10 @@
 {
   description = "My NUR repository";
-  inputs = {
+  inputs = rec {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+
+    stable.url = "github:nixos/nixpkgs/release-22.11";
+    unstable = nixpkgs;
 
     # Adds flake compatability to start removing the vestiges of 
     # shell.nix and move us towards the more modern nix develop
@@ -10,6 +13,20 @@
     flake-compat = {
       url = "github:edolstra/flake-compat";
       flake = false;
+    };
+
+    flake-utils.url = "github:numtide/flake-utils";
+
+    vulnix-pre-commit = {
+      url = "github:jayrovacsek/vulnix-pre-commit";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        pre-commit-hooks.follows = "pre-commit-hooks";
+        stable.follows = "stable";
+        unstable.follows = "unstable";
+        flake-utils.follows = "flake-utils";
+        flake-compat.follows = "flake-compat";
+      };
     };
 
     # Adds configurable pre-commit options to our flake :)
@@ -21,7 +38,6 @@
         flake-compat.follows = "flake-compat";
       };
     };
-    flake-utils.url = "github:numtide/flake-utils";
   };
   outputs = { self, flake-utils, ... }:
 
@@ -46,7 +62,7 @@
 
         devShell = pkgs.mkShell {
           name = "nix-config-dev-shell";
-          packages = with pkgs; [ nixfmt vulnix ];
+          packages = with pkgs; [ nixfmt vulnix statix ];
           # Self reference to make the default shell hook that which generates
           # a suitable pre-commit hook installation
           inherit (self.checks.${system}.pre-commit-check) shellHook;
@@ -56,7 +72,7 @@
         # devShells.${system}.default recommended structure
         devShells.default = self.outputs.devShell.${system};
 
-        packages =
-          flake-utils.lib.flattenTree (import ./default { inherit pkgs; });
+        packages = flake-utils.lib.flattenTree
+          (import ./packages { inherit self pkgs system; });
       in { inherit devShell devShells packages checks; });
 }
