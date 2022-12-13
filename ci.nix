@@ -40,7 +40,7 @@ let
 
   outputsOf = p: map (o: p.${o}) p.outputs;
 
-  nurAttrs = import ./default.nix { inherit pkgs; };
+  nurAttrs = import ./default.nix;
 
   nurPkgs = flattenPkgs (listToAttrs (map (n: nameValuePair n nurAttrs.${n})
     (filter (n: !isReserved n) (attrNames nurAttrs))));

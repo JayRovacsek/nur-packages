@@ -40,7 +40,6 @@
     };
   };
   outputs = { self, flake-utils, ... }:
-
     flake-utils.lib.eachSystem [
       "aarch64-linux"
       "aarch64-darwin"
