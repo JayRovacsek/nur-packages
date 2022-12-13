@@ -38,6 +38,6 @@ jobs:
           commit-message: "chore: update nix flake inputs to the latest revision"
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-          assignees: imincik
-          reviewers: imincik
+          assignees: jayrovacsek
+          reviewers: jayrovacsek
           token: ${{ secrets.FLAKE_AUTOUPDATE_TOKEN }}
