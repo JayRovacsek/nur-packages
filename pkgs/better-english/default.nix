@@ -1,4 +1,4 @@
-{ self, pkgs, system }:
+{ pkgs, ... }:
 let
   inherit (pkgs) fetchurl lib stdenv;
   buildFirefoxXpiAddon = lib.makeOverridable
