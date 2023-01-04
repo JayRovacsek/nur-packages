@@ -7,8 +7,9 @@
       enable = true;
       name = "Prettier Write";
       entry = "${pkgs.nodePackages.prettier}/bin/prettier --write .";
-      files = "\\.(js|ts|jsx|tsx|json|yml|yaml)$";
+      files = "\\.(js|ts|jsx|tsx|json|yml)$";
       language = "system";
+      excludes = [ "\\.pre-commit-config\\.yaml" ];
     };
 
     statix-write = {
