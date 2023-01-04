@@ -22,8 +22,6 @@
       inputs = {
         nixpkgs.follows = "nixpkgs";
         pre-commit-hooks.follows = "pre-commit-hooks";
-        stable.follows = "stable";
-        unstable.follows = "unstable";
         flake-utils.follows = "flake-utils";
         flake-compat.follows = "flake-compat";
       };
@@ -40,11 +38,14 @@
     };
   };
   outputs = { self, flake-utils, ... }:
-    flake-utils.lib.eachSystem [
+    let systems = import ./systems.nix;
+    in flake-utils.lib.eachSystem [
       "aarch64-linux"
+      "x86_64-linux"
       "aarch64-darwin"
       "x86_64-darwin"
-      "x86_64-linux"
+      "armv6l-linux"
+      "armv7l-linux"
     ] (system:
       let
         # Note that the below use of pkgs will by implication mean that
@@ -60,7 +61,7 @@
         };
 
         devShell = pkgs.mkShell {
-          name = "nix-config-dev-shell";
+          name = "nur-dev-shell";
           packages = with pkgs; [ nixfmt vulnix statix ];
           # Self reference to make the default shell hook that which generates
           # a suitable pre-commit hook installation
@@ -71,7 +72,9 @@
         # devShells.${system}.default recommended structure
         devShells.default = self.outputs.devShell.${system};
 
+        lib = import ./lib { inherit pkgs; };
+
         packages = flake-utils.lib.flattenTree
-          (import ./packages { inherit self pkgs system; });
-      in { inherit devShell devShells packages checks; });
+          (import ./default.nix { inherit self pkgs system; });
+      in { inherit lib devShell devShells packages checks; });
 }
